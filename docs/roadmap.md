@@ -25,6 +25,25 @@ Phase 1 Azure verification precedes language evaluation. Phase 2 can start once 
 
 Each issue includes objective, scope/checklist, acceptance criteria, dependencies, and validation. Milestones map to the four phases. Labels identify functional areas and priorities; P0 marks prerequisites and core flow, and P1 marks readiness work. Dependencies are recorded as linked issue references. No dates are assigned until implementation scheduling is agreed.
 
+## GitHub tracking
+
+[View all phase milestones](https://github.com/anshika6252/call-insights-foundry-demo/milestones). The initial planning documentation is complete; the following implementation issues remain open.
+
+| Issue | Work item | Phase | Dependencies |
+| --- | --- | --- | --- |
+| [#1](https://github.com/anshika6252/call-insights-foundry-demo/issues/1) | Verify Azure Foundry and Speech configuration | 1 | None |
+| [#2](https://github.com/anshika6252/call-insights-foundry-demo/issues/2) | Evaluate English, Hindi and Hinglish transcription feasibility | 1 | [#1](https://github.com/anshika6252/call-insights-foundry-demo/issues/1) |
+| [#3](https://github.com/anshika6252/call-insights-foundry-demo/issues/3) | Scaffold Streamlit application and configuration | 2 | [#1](https://github.com/anshika6252/call-insights-foundry-demo/issues/1) |
+| [#4](https://github.com/anshika6252/call-insights-foundry-demo/issues/4) | Implement SQLite schema and processing lifecycle | 2 | [#3](https://github.com/anshika6252/call-insights-foundry-demo/issues/3) |
+| [#5](https://github.com/anshika6252/call-insights-foundry-demo/issues/5) | Build audio upload, language selection and validation | 2 | [#3](https://github.com/anshika6252/call-insights-foundry-demo/issues/3), [#4](https://github.com/anshika6252/call-insights-foundry-demo/issues/4) |
+| [#6](https://github.com/anshika6252/call-insights-foundry-demo/issues/6) | Integrate multilingual Azure transcription | 3 | [#2](https://github.com/anshika6252/call-insights-foundry-demo/issues/2), [#4](https://github.com/anshika6252/call-insights-foundry-demo/issues/4), [#5](https://github.com/anshika6252/call-insights-foundry-demo/issues/5) |
+| [#7](https://github.com/anshika6252/call-insights-foundry-demo/issues/7) | Implement evidence-linked structured summaries | 3 | [#1](https://github.com/anshika6252/call-insights-foundry-demo/issues/1), [#4](https://github.com/anshika6252/call-insights-foundry-demo/issues/4), [#6](https://github.com/anshika6252/call-insights-foundry-demo/issues/6) |
+| [#8](https://github.com/anshika6252/call-insights-foundry-demo/issues/8) | Build end-to-end Streamlit processing and result views | 3 | [#5](https://github.com/anshika6252/call-insights-foundry-demo/issues/5), [#6](https://github.com/anshika6252/call-insights-foundry-demo/issues/6), [#7](https://github.com/anshika6252/call-insights-foundry-demo/issues/7) |
+| [#9](https://github.com/anshika6252/call-insights-foundry-demo/issues/9) | Add saved history, Unicode exports and call deletion | 4 | [#4](https://github.com/anshika6252/call-insights-foundry-demo/issues/4), [#8](https://github.com/anshika6252/call-insights-foundry-demo/issues/8) |
+| [#10](https://github.com/anshika6252/call-insights-foundry-demo/issues/10) | Implement bounded retries and interrupted-run recovery | 4 | [#6](https://github.com/anshika6252/call-insights-foundry-demo/issues/6), [#7](https://github.com/anshika6252/call-insights-foundry-demo/issues/7), [#8](https://github.com/anshika6252/call-insights-foundry-demo/issues/8) |
+| [#11](https://github.com/anshika6252/call-insights-foundry-demo/issues/11) | Validate multilingual quality and application acceptance | 4 | [#2](https://github.com/anshika6252/call-insights-foundry-demo/issues/2), [#8](https://github.com/anshika6252/call-insights-foundry-demo/issues/8), [#9](https://github.com/anshika6252/call-insights-foundry-demo/issues/9), [#10](https://github.com/anshika6252/call-insights-foundry-demo/issues/10) |
+| [#12](https://github.com/anshika6252/call-insights-foundry-demo/issues/12) | Finalize setup guide and demo walkthrough | 4 | [#11](https://github.com/anshika6252/call-insights-foundry-demo/issues/11) |
+
 ## Deferred work
 
 Streaming calls, telephony, identity/roles, sentiment, multilingual summary formats beyond English/Hindi, Romanized Hindi, cloud hosting, multiple users, and production retention/compliance controls are future scope.
