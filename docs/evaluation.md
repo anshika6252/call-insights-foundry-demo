@@ -1,28 +1,30 @@
-# Language and quality evaluation
+# English and Hindi evaluation
 
-## Evaluation set
+## Current evidence
 
-Prepare at least nine short synthetic or consented recordings: three English, three Hindi, and three Hinglish. Have a Hindi/English-capable reviewer produce reference transcripts and expected facts. Include Indian accents, clean and noisy audio, two speakers, names, amounts, dates, corrections, negation, and unresolved outcomes. Hinglish samples must include within-sentence switching, not only alternating monolingual turns.
+Offline software tests and synthetic UI previews are implemented. No Azure request or representative audio evaluation has been completed because Azure is not configured. [Validation report](validation-report.md) records software checks; [language feasibility](language-feasibility.md) contains the pending live worksheet. Hinglish is deferred.
 
-Example content: “Payment ho gaya hai, but confirmation email nahi aaya.” Include both clear actions and suggestions that must not be reported as commitments.
+## Six-recording evaluation set
+
+Prepare three English and three Hindi synthetic or consented recordings using [text scenarios](evaluation-fixtures.json) as optional scripts. A Hindi/English-capable reviewer should create reference transcripts and expected facts. Include Indian accents, clean/noisy audio, two speakers, names, amounts, dates, corrections, negation and unresolved outcomes. Text fixtures are not recordings or measured results.
 
 ## Transcription review
 
-Record selected Azure service/configuration, region, API/model version, sample language category, duration, processing latency, available usage, transcript errors, speaker consistency, and script behavior. Report word error rate where useful with documented normalization; cross-script/transliteration differences require bilingual review and must not be concealed by normalization.
+Record Azure region, API/configuration, sample duration, latency, available usage, transcript errors, speaker consistency and script behavior. Report word error rate with documented normalization where useful. Bilingual review must assess critical facts; do not hide script/transliteration errors through normalization.
 
-The language feasibility issue sets measured thresholds after the baseline. Before proceeding, document whether critical names, amounts, dates, and negation are preserved on the demo set and whether errors require a configuration change or an explicit limitation. No measured results exist yet.
+Set a numeric quality target from a transparent baseline before declaring feasibility passed. A wrong critical name, amount, date, negation or commitment fails the sample regardless of aggregate word error rate. Document configuration changes and repeat affected cases.
 
 ## Summary acceptance
 
-- English and Hindi summaries reflect the source meaning and do not invent decisions, owners, dates, or outcomes.
-- Every action item and decision has valid segment references supporting the claim.
-- All important manually annotated facts appear correctly in the curated acceptance set, or the case fails review.
-- Unknown owners/dates remain unspecified, and suggestions remain distinguishable from commitments.
-- Instructions spoken in the recording cannot override the summary schema or application instructions.
-- Invalid/empty model responses and out-of-budget transcripts produce clear errors; no silent truncation.
+- Review both English and Hindi summaries for each recording category.
+- Every action and decision needs source evidence supporting the claim, not merely an existing segment ID.
+- Important annotated facts must be accurate; unknown owners/dates remain unspecified.
+- Suggestions must not become commitments; relative dates remain as spoken unless explicit source evidence resolves them.
+- Spoken instructions are source content and must not override the summarization task.
+- Invalid/refused/truncated output and oversized input fail clearly without silent source truncation.
 
-## Application validation
+## Software acceptance
 
-Test input type/size/duration validation, corrupt or silent audio, SQLite restart persistence, foreign-key deletion, schema/reference validation, UI rerun duplicate prevention, transient errors, throttling, timeouts, failed-summary retry, interrupted-run recovery, Unicode exports, and temporary-file cleanup. Use mocked Azure responses for repeatable automated tests, plus a small consented/synthetic live smoke test for integration.
+Tests cover audio content/size/duration validation, corrupt audio, mocked empty-speech responses, schema/reference validation, persistence, cascade deletion, atomic claims, retries, safe errors, interrupted runs, Unicode exports, temporary cleanup, Streamlit preview/history and rerun behavior. Live success is a separate gate.
 
-Final acceptance demonstrates processing and reopening a representative call from each language category, exporting results, deleting a call, and recovering from a failure. Report live findings honestly, including sample count and limitations; small demo evaluation is not a production accuracy guarantee.
+Final live acceptance demonstrates upload, transcript, summary, save, restart/reopen, export and recovery for English/Hindi calls. Publish actual sample count, failures and limitations. Small demo evaluation does not establish production accuracy.

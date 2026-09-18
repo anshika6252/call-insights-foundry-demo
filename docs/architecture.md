@@ -1,6 +1,6 @@
 # Architecture and data model
 
-## Proposed flow
+## Implemented flow
 
 ```mermaid
 flowchart LR
@@ -18,7 +18,7 @@ Streamlit handles presentation. Python service modules handle validation, Azure 
 
 ## Language behavior
 
-Input mode is Auto, English, Hindi, or Hinglish. Store that choice separately from provider-detected locales. Do not force a Hinglish recording through a monolingual setting without evaluation. Preserve provider transcript text and timing. Mixed-script display is a quality target, not a guaranteed API behavior. Do not silently translate, transliterate, or rewrite the saved transcript.
+Input mode is English or Hindi, selected explicitly. Hinglish and automatic language detection are deferred. Store that choice separately from provider-detected locales. Preserve provider transcript text and timing; do not silently translate, transliterate, or rewrite the saved transcript. Live language quality remains unverified.
 
 Summary language is English by default or Hindi by selection. Translate meaning while preserving names, numbers, dates, negation, commitments, and uncertainty. Treat spoken instructions as transcript content, never as instructions to the summarizer.
 
@@ -33,21 +33,21 @@ Summary language is English by default or Hindi by selection. Translate meaning 
 
 ## SQLite entities
 
-| Entity | Planned fields |
+| Entity | Fields |
 | --- | --- |
 | calls | ID, original filename, SHA-256 hash, input mode, detected locales, duration, size, created/updated timestamps, status, failed stage |
 | transcript_segments | ID, call ID, sequence, optional speaker label, start/end milliseconds, original text, optional detected locale |
 | summaries | ID, call ID, structured JSON, summary language, schema/prompt versions, deployment, timestamp |
 | processing_runs | ID, call ID, stage, start/end timestamps, outcome, sanitized error, provider request ID when available, available usage metrics |
 
-Use foreign keys, transactions, indexed call references, and deterministic segment ordering. Deleting a call removes dependent records. SQLite is suitable for this single-instance local demo; deployment or multiuser operation would need a separate design review.
+Foreign keys, transactions, indexed call references, and deterministic segment ordering are implemented. Schema version 1 uses SQLite user_version; newer unknown versions are rejected. Deleting a call removes dependent records, and active calls cannot be deleted. Run one Streamlit process per database; deployment or multiuser operation needs a separate design review.
 
 ## Lifecycle and recovery
 
 `uploaded → transcribing → summarizing → completed`; failures record the stage and a sanitized reason. Persist the transcript before starting summarization. A failed summary can be retried without retranscribing. Since source audio is temporary, transcription retry after cleanup or restart requires re-upload. Interrupted runs are marked recoverable/failed on restart rather than appearing indefinitely active.
 
-Streamlit reruns must not repeat paid requests. Use persisted processing state, explicit submit actions, and an in-flight guard. Warn on a matching file hash and allow deliberate reprocessing. Bounded retries apply to transient errors only; handle timeouts, throttling, invalid credentials, unsupported media, empty speech, and invalid model output distinctly.
+Streamlit reruns do not submit processing requests. Persisted state and an atomic stage claim guard duplicate work; matching hashes trigger an explicit reprocessing choice. Bounded retries apply only to transient failures. Cancellation control signals release the claimed stage and are re-raised to Streamlit. A crash between stages can leave an uploaded call with a saved transcript; history offers summary retry for this state too.
 
 ## Storage and privacy
 
-Temporary audio uses generated paths and is cleaned up on success and failure; stale files are cleaned after interruption. Do not log credentials, audio, or full transcripts. History retains text until the user deletes the call. Do not commit runtime data. Limit accepted input before service submission and enforce a transcript context budget; reject oversized text with a clear message rather than silently truncating it.
+Temporary audio uses generated paths and is cleaned on success, failure and cancellation. Startup removes generated audio older than 24 hours from the configured temporary directory. Current uploads can remain in Streamlit session memory until removed or the session ends. Credentials, audio and full transcripts are not logged. History retains text until deletion; runtime data is ignored by Git. Audio limits are checked before submission. Serialized transcript characters are bounded before summarization; this is not an exact token/context guarantee. Oversized text fails without truncation.

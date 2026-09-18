@@ -1,49 +1,56 @@
-# Phased roadmap
+# Phased roadmap and execution status
 
-All implementation is pending. Phase milestones and issues in GitHub track execution; this document defines the gates. Estimates are planning ranges, not commitments, and exclude Azure access delays.
+Current scope: **English and Hindi only**. Hinglish and automatic language detection are deferred. Software implementation is available and tested offline. Azure configuration and live speech/summary validation remain pending.
 
-| Phase | Scope | Exit gate | Estimate |
-| --- | --- | --- | --- |
-| 1 — Azure and language feasibility | Verify Azure access, region and deployment; evaluate English/Hindi/Hinglish | Selected transcription configuration and model, documented language findings and agreed limitations | 1–2 days |
-| 2 — Application foundation | Python/Streamlit scaffold, configuration, SQLite, upload validation | App starts, validates inputs, and persists call metadata across restart | 1 day |
-| 3 — End-to-end call insights | Transcription adapter, structured summarization, processing UI | Representative calls in all three language categories produce saved transcript and summary | 2 days |
-| 4 — Reliability and demo readiness | History/exports/deletion, recovery, quality checks, final guides | End-to-end acceptance checks pass and demo is reproducible | 1–2 days |
+| Phase | Delivered | Exit gate still pending |
+| --- | --- | --- |
+| 1 — Azure and language feasibility | API adapters, setup instructions, six synthetic text scripts, evaluation worksheet | Real configured Azure endpoints and representative recording evaluation |
+| 2 — Application foundation | Python/Streamlit startup, configuration, SQLite, audio validation | Complete under offline test scope |
+| 3 — End-to-end call insights | Transcription/summary adapters, evidence validation, processing UI, synthetic previews | Real English/Hindi calls through Azure and human summary review |
+| 4 — Reliability and demo readiness | History, exports, deletion, retries, cancellation/restart recovery, tests, guides, independent review | Live demo rehearsal and final language-quality signoff |
 
-Expected total: approximately 5–7 focused development days, subject to the Hinglish feasibility gate.
+Original planning estimate was 5–7 focused development days, excluding Azure access delays. This estimate is historical, not a claim of elapsed work or a revised delivery date.
 
-## Sequencing
+## Agent roles
 
-Phase 1 Azure verification precedes language evaluation. Phase 2 can start once configuration requirements are clear, but final transcription integration depends on Phase 1 findings. Persistence and upload validation precede integration. Summarization depends on the transcript contract. UI orchestration follows both integrations. Recovery and history lead into final validation and documentation.
+All five requested roles contributed. Because the session permits three concurrent subagents, they worked in stages.
 
-## Decision gates
+- **Architect:** provider-independent models, validation contracts and architectural boundaries; issue #1 configuration design.
+- **AI expert:** issues #2/#6/#7, Azure adapter request/response contracts, safe errors, structured summaries, setup/evaluation documentation.
+- **Developer 1:** issues #4/#5/#10 backend, SQLite transactions, audio validation, temporary-file cleanup and recovery tests.
+- **Developer 2:** issues #3/#5/#8/#9/#12 UI work, Streamlit preview/results/history, exports and AppTest.
+- **Code reviewer:** issue #11 software review, independent cancellation regressions, acceptance boundary checks.
+- **Coordinator:** dependency/configuration scaffolding, pipeline integration, final documentation, GitHub tracking and verification.
 
-1. **Language feasibility:** Do not claim Hinglish support based only on separate Hindi and English support. Evaluate within-sentence switches and script behavior. If the initial Azure Speech configuration is inadequate, compare an available Azure-hosted transcription alternative and document feature tradeoffs before implementation proceeds.
-2. **Summary fidelity:** Important decisions and actions need valid evidence references. Unknown owners/dates must remain unspecified. Structural validation and human factual review are both required.
-3. **Demo readiness:** Show all three language categories, persistence, export, and a recoverable failure. Record known limitations and measured performance.
+Owner labels and assignment comments represent agent responsibilities; subagents are not GitHub user accounts. Reviewer findings are in [code-review.md](code-review.md).
 
-## Backlog conventions
+## Issues
 
-Each issue includes objective, scope/checklist, acceptance criteria, dependencies, and validation. Milestones map to the four phases. Labels identify functional areas and priorities; P0 marks prerequisites and core flow, and P1 marks readiness work. Dependencies are recorded as linked issue references. No dates are assigned until implementation scheduling is agreed.
+| Issue | Owner | Implementation / acceptance status |
+| --- | --- | --- |
+| [#1 Verify Azure configuration](https://github.com/anshika6252/call-insights-foundry-demo/issues/1) | Architect | Instructions ready; blocked on user Azure setup |
+| [#2 English/Hindi feasibility](https://github.com/anshika6252/call-insights-foundry-demo/issues/2) | AI expert | Text scenarios ready; actual audio evaluation pending |
+| [#3 Scaffold/configuration](https://github.com/anshika6252/call-insights-foundry-demo/issues/3) | Developer 2 + coordinator | Implemented; local startup and configuration tested |
+| [#4 SQLite](https://github.com/anshika6252/call-insights-foundry-demo/issues/4) | Developer 1 | Implemented; persistence, claims, schema and cascade tests pass |
+| [#5 Upload validation](https://github.com/anshika6252/call-insights-foundry-demo/issues/5) | Developer 1 + Developer 2 | Implemented; audio validation and upload/UI guards tested |
+| [#6 Transcription](https://github.com/anshika6252/call-insights-foundry-demo/issues/6) | AI expert | Adapter tests pass; live service acceptance pending |
+| [#7 Summaries](https://github.com/anshika6252/call-insights-foundry-demo/issues/7) | AI expert | Schema/prompt/reference tests pass; factual live evaluation pending |
+| [#8 End-to-end UI](https://github.com/anshika6252/call-insights-foundry-demo/issues/8) | Developer 2 | UI/offline workflow implemented; real Azure end-to-end run pending |
+| [#9 History/export/delete](https://github.com/anshika6252/call-insights-foundry-demo/issues/9) | Developer 2 | Implemented; restart/history/Unicode export/deletion checks pass |
+| [#10 Recovery](https://github.com/anshika6252/call-insights-foundry-demo/issues/10) | Developer 1 + coordinator | Implemented; retry, cancellation and interrupted-run checks pass |
+| [#11 Quality acceptance](https://github.com/anshika6252/call-insights-foundry-demo/issues/11) | Code reviewer | Offline suite and review complete; live bilingual evaluation pending |
+| [#12 Final guides](https://github.com/anshika6252/call-insights-foundry-demo/issues/12) | Developer 2 + coordinator | Offline quickstart/screenshots/troubleshooting ready; live rehearsal pending |
 
-## GitHub tracking
+[Milestones](https://github.com/anshika6252/call-insights-foundry-demo/milestones) track these phases. Complete software issues are closed with validation comments; any issue whose original acceptance requires Azure or human audio review stays open. No live acceptance criterion is silently dropped.
 
-[View all phase milestones](https://github.com/anshika6252/call-insights-foundry-demo/milestones). The initial planning documentation is complete; the following implementation issues remain open.
+## Next execution steps
 
-| Issue | Work item | Phase | Dependencies |
-| --- | --- | --- | --- |
-| [#1](https://github.com/anshika6252/call-insights-foundry-demo/issues/1) | Verify Azure Foundry and Speech configuration | 1 | None |
-| [#2](https://github.com/anshika6252/call-insights-foundry-demo/issues/2) | Evaluate English, Hindi and Hinglish transcription feasibility | 1 | [#1](https://github.com/anshika6252/call-insights-foundry-demo/issues/1) |
-| [#3](https://github.com/anshika6252/call-insights-foundry-demo/issues/3) | Scaffold Streamlit application and configuration | 2 | [#1](https://github.com/anshika6252/call-insights-foundry-demo/issues/1) |
-| [#4](https://github.com/anshika6252/call-insights-foundry-demo/issues/4) | Implement SQLite schema and processing lifecycle | 2 | [#3](https://github.com/anshika6252/call-insights-foundry-demo/issues/3) |
-| [#5](https://github.com/anshika6252/call-insights-foundry-demo/issues/5) | Build audio upload, language selection and validation | 2 | [#3](https://github.com/anshika6252/call-insights-foundry-demo/issues/3), [#4](https://github.com/anshika6252/call-insights-foundry-demo/issues/4) |
-| [#6](https://github.com/anshika6252/call-insights-foundry-demo/issues/6) | Integrate multilingual Azure transcription | 3 | [#2](https://github.com/anshika6252/call-insights-foundry-demo/issues/2), [#4](https://github.com/anshika6252/call-insights-foundry-demo/issues/4), [#5](https://github.com/anshika6252/call-insights-foundry-demo/issues/5) |
-| [#7](https://github.com/anshika6252/call-insights-foundry-demo/issues/7) | Implement evidence-linked structured summaries | 3 | [#1](https://github.com/anshika6252/call-insights-foundry-demo/issues/1), [#4](https://github.com/anshika6252/call-insights-foundry-demo/issues/4), [#6](https://github.com/anshika6252/call-insights-foundry-demo/issues/6) |
-| [#8](https://github.com/anshika6252/call-insights-foundry-demo/issues/8) | Build end-to-end Streamlit processing and result views | 3 | [#5](https://github.com/anshika6252/call-insights-foundry-demo/issues/5), [#6](https://github.com/anshika6252/call-insights-foundry-demo/issues/6), [#7](https://github.com/anshika6252/call-insights-foundry-demo/issues/7) |
-| [#9](https://github.com/anshika6252/call-insights-foundry-demo/issues/9) | Add saved history, Unicode exports and call deletion | 4 | [#4](https://github.com/anshika6252/call-insights-foundry-demo/issues/4), [#8](https://github.com/anshika6252/call-insights-foundry-demo/issues/8) |
-| [#10](https://github.com/anshika6252/call-insights-foundry-demo/issues/10) | Implement bounded retries and interrupted-run recovery | 4 | [#6](https://github.com/anshika6252/call-insights-foundry-demo/issues/6), [#7](https://github.com/anshika6252/call-insights-foundry-demo/issues/7), [#8](https://github.com/anshika6252/call-insights-foundry-demo/issues/8) |
-| [#11](https://github.com/anshika6252/call-insights-foundry-demo/issues/11) | Validate multilingual quality and application acceptance | 4 | [#2](https://github.com/anshika6252/call-insights-foundry-demo/issues/2), [#8](https://github.com/anshika6252/call-insights-foundry-demo/issues/8), [#9](https://github.com/anshika6252/call-insights-foundry-demo/issues/9), [#10](https://github.com/anshika6252/call-insights-foundry-demo/issues/10) |
-| [#12](https://github.com/anshika6252/call-insights-foundry-demo/issues/12) | Finalize setup guide and demo walkthrough | 4 | [#11](https://github.com/anshika6252/call-insights-foundry-demo/issues/11) |
+1. Configure existing Speech and Foundry Azure OpenAI resources using [Azure setup](azure-setup.md).
+2. Validate deployed access/region/quota and complete #1.
+3. Record the six scripts or supply consented representative audio; measure English/Hindi transcription and summary quality for #2/#6/#7/#11.
+4. Rehearse the real upload-to-history/export workflow and finalize #8/#12.
+5. Consider Hinglish only as separately scoped future work.
 
 ## Deferred work
 
-Streaming calls, telephony, identity/roles, sentiment, multilingual summary formats beyond English/Hindi, Romanized Hindi, cloud hosting, multiple users, and production retention/compliance controls are future scope.
+Hinglish, auto language detection, live streaming, telephony, authentication, multiuser/cloud hosting, persistent audio playback, sentiment analysis, vector search, agent orchestration and production retention controls.

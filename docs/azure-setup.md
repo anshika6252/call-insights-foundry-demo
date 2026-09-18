@@ -1,36 +1,33 @@
-# Azure setup plan
+# Azure setup
 
-This is a setup checklist for future implementation. No resources or model deployments have been created or verified for this project.
+Adapters are implemented; resources, regional availability and live requests are unverified. Current scope: English and Hindi; Hinglish is deferred.
 
-## Required decisions
+## Configure existing resources
 
-1. Identify the Azure subscription and project/resource group with access to Foundry and Speech.
-2. Verify region, language, diarization, API, quota, and model availability before provisioning.
-3. Validate Azure Speech fast transcription using English and Hindi samples, then mixed Hindi-English recordings. Evaluate the documented multilingual configuration; do not assume locale identifiers or behavior from UI labels.
-4. Select a Foundry-hosted summarization deployment with structured output support and enough context for the permitted recordings.
-5. Choose supported authentication for each endpoint. Prefer local developer identity where supported and practical; otherwise keep keys in environment variables outside Git. Record required roles or access settings.
-6. Pin the selected SDK/API versions and document the exact resource/endpoint relationships. Speech and model inference may use different endpoints and authentication settings.
-7. Record usage metrics available from the APIs and current regional pricing before estimating cost. Set appropriate spending controls for the demo.
+1. Select a Speech resource supporting fast transcription in its region and verify en-IN and hi-IN availability.
+2. Select an Azure OpenAI deployment supporting Chat Completions structured outputs. Check its context window, quota and regional pricing.
+3. Copy .env.example to .env. Set AZURE_SPEECH_ENDPOINT (HTTPS resource root), AZURE_SPEECH_API_KEY, AZURE_OPENAI_ENDPOINT (HTTPS resource root), AZURE_OPENAI_API_KEY, and AZURE_OPENAI_DEPLOYMENT (deployment name). The services can require different endpoints and keys. Keep credentials out of Git and issues.
+4. Retain AZURE_SPEECH_API_VERSION=2025-10-15. Summaries use /openai/v1/chat/completions without a dated API query.
+5. Follow the README to start the app. It reports missing setting names without exposing values. Authentication currently uses API keys; Entra ID is a future hardening option, not implemented behavior.
 
-## Planned configuration
+## Request behavior
 
-The implementation should document required settings for Speech endpoint/region and authentication, Foundry model endpoint and deployment, applicable API version, SQLite path, temporary audio location, file-size/duration limits, request timeouts, and retry limits. Actual environment-variable names will be finalized with the SDK choices. A future `.env.example` must contain placeholders only.
+Speech uploads audio as multipart data with explicit en-IN or hi-IN and diarization limited to two speakers. Timestamps come from phrases; anonymous speaker labels do not establish roles. Stereo uses the service default merged-channel behavior.
 
-## Service selection rationale
+Summaries use strict JSON Schema with English or Hindi instructions. Actions and decisions cite segment IDs; local validation proves reference existence, not factual entailment. Refusals, truncated completions, empty speech and malformed responses fail clearly. Orchestration retries transient failures; provider bodies are never displayed.
 
-Fast transcription is the initial candidate for uploaded demo recordings and speaker separation. Microsoft documents multilingual configuration and language support. Continuous language identification has limitations around language changes within a sentence, so it must not be treated as proof of Hinglish accuracy. Multilingual feasibility testing is mandatory before promising support.
+CALL_INSIGHTS_MAX_TRANSCRIPT_CHARS=24000 bounds serialized transcript input; this is not a token count or context-window guarantee. Verify prompt/schema/output overhead against the deployment. Oversized input fails instead of being truncated. Timeout defaults to 120 seconds and maximum attempts to 3. Retries may incur additional charges. Available usage tokens are recorded without invented prices.
 
-Structured model outputs support a predictable summary schema, but the app must also validate references and review factual fidelity. No model deployment name or availability is assumed.
+## Pending live acceptance
 
-## References
+Record the six scripts in evaluation-fixtures.json with consent and bilingual reference transcripts. Evaluate three recordings per language and both summary output languages. Log region, versions, latency, word errors, speaker consistency and fact fidelity in language-feasibility.md. Mocked tests are not language or service validation.
+
+Check regional pricing and spending controls before processing. No Azure resources were created by this project. If dedicated demo resources are later created, remove only those named resources after use; preserve shared resources.
+
+## Official references (checked 2026-09-17)
 
 - [Fast transcription](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/fast-transcription-create)
-- [Speech language support](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support)
-- [Language identification and limitations](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-identification)
-- [Structured outputs in Foundry](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/structured-outputs)
-
-These references informed the plan on 2026-09-17. Recheck availability during implementation.
-
-## Cleanup
-
-The final guide must identify project-created Azure resources and explain how to remove them after the demo without touching shared resources. No Azure resource creation is authorized by this documentation task.
+- [Languages](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support)
+- [Regions](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/regions)
+- [Structured outputs](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/structured-outputs)
+- [Azure OpenAI v1](https://learn.microsoft.com/en-us/azure/foundry/openai/latest)
