@@ -30,4 +30,4 @@ The preview is handwritten and cannot demonstrate recognition or generated-summa
 - Live upload-to-history/export workflow and fresh live demo rehearsal (#8/#12).
 - Measured Azure cost and service latency; no estimates are presented as actuals.
 
-GitHub Actions is configured for Python 3.12 on Ubuntu and Windows. Its remote run is tracked separately from these local checks.
+GitHub Actions also passed on both **Ubuntu and Windows with Python 3.12**, including fresh dependency installation and the full offline suite. [Successful run for implementation commit 33a9165](https://github.com/anshika6252/call-insights-foundry-demo/actions/runs/35317563741). This remote run independently confirms the software checks; it uses no Azure credentials.
