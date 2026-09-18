@@ -66,3 +66,50 @@ def test_interrupted_between_stages_can_retry_without_automatic_processing(monke
     assert retry.disabled  # Credentials remain absent.
     assert len(repo.list_calls()) == 1
     assert len(repo.list_runs(call_id)) == 1
+
+
+def submit_settings(app, **values):
+    for name, value in values.items():
+        app.text_input(key="azure_" + name).set_value(value)
+    next(button for button in app.button if button.label == "Apply Azure settings").click().run()
+
+
+def test_ui_configuration_apply_invalid_edit_clear_and_session_isolation(monkeypatch, tmp_path):
+    import os
+    app = setup_app(monkeypatch, tmp_path).run()
+    submit_settings(app, speech_endpoint="https://speech.example", speech_api_key="session-secret",
+        summary_endpoint="https://models.example", summary_api_key="model-secret", summary_deployment="demo")
+    assert not app.exception
+    assert not app.get("file_uploader")[0].disabled
+    from streamlit.proto.TextInput_pb2 import TextInput
+    assert app.text_input(key="azure_speech_api_key").proto.type == TextInput.PASSWORD
+    assert os.environ["AZURE_SPEECH_API_KEY"] == ""
+    app.run()
+    assert not app.get("file_uploader")[0].disabled
+    submit_settings(app, speech_endpoint="http://invalid.example")
+    assert any("not applied" in error.value for error in app.error)
+    assert app.session_state["azure_overrides"]["speech_endpoint"] == "https://speech.example"
+    assert not app.get("file_uploader")[0].disabled
+    other = setup_app(monkeypatch, tmp_path).run()
+    assert other.get("file_uploader")[0].disabled
+    assert other.text_input(key="azure_speech_api_key").value == ""
+    next(button for button in app.button if button.label == "Clear session settings").click().run()
+    assert not app.exception
+    assert app.get("file_uploader")[0].disabled
+    assert app.text_input(key="azure_speech_api_key").value == ""
+
+
+def test_partial_ui_settings_use_env_fallback_without_prefilling_secrets(monkeypatch, tmp_path):
+    app = setup_app(monkeypatch, tmp_path)
+    monkeypatch.setenv("AZURE_SPEECH_ENDPOINT", "https://speech.example")
+    monkeypatch.setenv("AZURE_SPEECH_API_KEY", "fallback-secret")
+    monkeypatch.setenv("AZURE_OPENAI_ENDPOINT", "https://models.example")
+    monkeypatch.setenv("AZURE_OPENAI_API_KEY", "fallback-model-secret")
+    monkeypatch.setenv("AZURE_OPENAI_DEPLOYMENT", "fallback-model")
+    app.run()
+    assert not app.get("file_uploader")[0].disabled
+    assert app.text_input(key="azure_speech_api_key").value == ""
+    submit_settings(app, summary_deployment="session-model")
+    assert app.session_state["azure_overrides"] == {"summary_deployment": "session-model"}
+    next(button for button in app.button if button.label == "Clear session settings").click().run()
+    assert not app.get("file_uploader")[0].disabled

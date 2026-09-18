@@ -16,7 +16,7 @@ Offline preview demonstrates the interface, not AI accuracy. Tests separately ex
 
 ## Live walkthrough — pending Azure
 
-1. Configure `.env` using [Azure setup](azure-setup.md), restart, and confirm configuration is present.
+1. Open **Azure settings** in the sidebar, enter endpoints/keys and the model deployment, then apply. Blank fields use environment/`.env` fallback. Confirm configuration is present; see [Azure setup](azure-setup.md).
 2. Select the actual English/Hindi recording language and desired summary language separately.
 3. Upload a consented or synthetic WAV/MP3 up to 50 MB and 10 minutes. Preview it and select **Transcribe and summarize**.
 4. Inspect stage progress, saved transcript, neutral speaker labels, summary and evidence.
@@ -31,7 +31,7 @@ Repeat with three recordings per language and both summary languages for the pen
 
 | Symptom | Action |
 | --- | --- |
-| Upload disabled | Expand Required configuration, set named variables, restart |
+| Upload disabled | Open Azure settings, supply missing values, and apply; environment/`.env` remains fallback |
 | Invalid endpoint | Use HTTPS resource root without path/query |
 | HTTP 401/403 | Check endpoint, key, resource access and deployment match |
 | HTTP 429/503 | Check quota/availability; retries are bounded |

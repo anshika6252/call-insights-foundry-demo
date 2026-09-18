@@ -2,6 +2,10 @@
 
 Date: 2026-09-18. Scope: local, single-process English/Hindi demo. No live Azure requests were made.
 
+## UI configuration follow-up (#13)
+
+Added session-only Azure endpoint/key/deployment configuration, with environment/.env fallback. Full local suite: **72 passed in 8.25 seconds**. New checks cover field precedence, blank fallback, masked inputs, invalid-submission rollback, clearing, rerun persistence and separate-session isolation. Browser inspection confirmed the sidebar form renders. Applying settings makes no Azure request; live acceptance remains pending. The earlier implementation validation below is retained as historical evidence.
+
 ## Completed checks
 
 | Check | Result |

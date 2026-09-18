@@ -3,6 +3,18 @@ import pytest
 from call_insights.config import Settings
 
 
+def test_ui_override_precedence_blank_fallback_and_no_mutation():
+    fallback = Settings(speech_endpoint="https://fallback.example", speech_api_key="fallback-key",
+                        summary_deployment="fallback-model")
+    merged = fallback.with_ui_overrides({"speech_endpoint": " https://session.example/ ",
+        "speech_api_key": " ", "summary_deployment": "ui-model", "db_path": "ignored"})
+    assert merged.speech_endpoint == "https://session.example"
+    assert merged.speech_api_key == "fallback-key"
+    assert merged.summary_deployment == "ui-model"
+    assert merged.db_path == fallback.db_path
+    assert fallback.speech_endpoint == "https://fallback.example"
+
+
 def test_missing_settings_are_actionable_without_keys():
     settings = Settings(speech_api_key="never-print-me")
     assert "never-print-me" not in repr(settings)

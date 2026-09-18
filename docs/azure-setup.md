@@ -6,9 +6,10 @@ Adapters are implemented; resources, regional availability and live requests are
 
 1. Select a Speech resource supporting fast transcription in its region and verify en-IN and hi-IN availability.
 2. Select an Azure OpenAI deployment supporting Chat Completions structured outputs. Check its context window, quota and regional pricing.
-3. Copy .env.example to .env. Set AZURE_SPEECH_ENDPOINT (HTTPS resource root), AZURE_SPEECH_API_KEY, AZURE_OPENAI_ENDPOINT (HTTPS resource root), AZURE_OPENAI_API_KEY, and AZURE_OPENAI_DEPLOYMENT (deployment name). The services can require different endpoints and keys. Keep credentials out of Git and issues.
-4. Retain AZURE_SPEECH_API_VERSION=2025-10-15. Summaries use /openai/v1/chat/completions without a dated API query.
-5. Follow the README to start the app. It reports missing setting names without exposing values. Authentication currently uses API keys; Entra ID is a future hardening option, not implemented behavior.
+3. In the app sidebar, expand **Azure settings**. Enter **Speech endpoint**, **Speech API key**, **Azure OpenAI endpoint**, **Azure OpenAI API key**, and **Model deployment name**, then select **Apply Azure settings**. Endpoints must be HTTPS resource roots without paths or query strings. The services may require different endpoints and keys. API-key fields are masked. Applied values remain in the current browser session only; they are not saved to SQLite, `.env`, files, or shared caches.
+4. Optional fallback: copy `.env.example` to `.env` and set AZURE_SPEECH_ENDPOINT, AZURE_SPEECH_API_KEY, AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY and AZURE_OPENAI_DEPLOYMENT. Precedence is nonblank applied UI value, then process environment, then `.env`. Blank UI fields use fallback values; fallback keys are never prefilled into UI fields. **Clear session settings** clears overrides and form values while retaining fallback configuration. Invalid submissions preserve the last valid applied settings. Restart after editing environment/.env settings; a new session may require re-entering UI credentials.
+5. Retain AZURE_SPEECH_API_VERSION=2025-10-15 in fallback configuration. Summaries use /openai/v1/chat/completions without a dated API query.
+6. Applying settings only validates completeness and URL format; it sends no Azure request. Connectivity is checked when processing audio. Authentication uses API keys; Entra ID is not implemented. Keep credentials out of Git and issues.
 
 ## Request behavior
 

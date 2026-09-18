@@ -1,7 +1,7 @@
 """Configuration validation without exposing credential values."""
 
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -21,6 +21,17 @@ class Settings:
     timeout_seconds: float = 120
     max_attempts: int = 3
     max_transcript_chars: int = 24000
+
+    def with_ui_overrides(self, values: dict[str, str]) -> "Settings":
+        """Nonblank session values override fallback settings, never the environment."""
+        allowed = {"speech_endpoint", "speech_api_key", "summary_endpoint",
+                   "summary_api_key", "summary_deployment"}
+        overrides = {name: value.strip() for name, value in values.items()
+                     if name in allowed and value.strip()}
+        for name in ("speech_endpoint", "summary_endpoint"):
+            if name in overrides:
+                overrides[name] = overrides[name].rstrip("/")
+        return replace(self, **overrides)
 
     @classmethod
     def from_env(cls, *, dotenv_path: str | Path = ".env") -> "Settings":
@@ -57,7 +68,7 @@ class Settings:
             ("AZURE_OPENAI_DEPLOYMENT", self.summary_deployment),
         ):
             if not value:
-                errors.append(f"Set {name} in .env or your environment.")
+                errors.append(f"Set {name} in Azure settings, .env, or your environment.")
         for name, endpoint in (("AZURE_SPEECH_ENDPOINT", self.speech_endpoint),
                                ("AZURE_OPENAI_ENDPOINT", self.summary_endpoint)):
             if endpoint:

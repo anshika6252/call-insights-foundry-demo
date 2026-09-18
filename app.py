@@ -20,6 +20,48 @@ def bootstrap(db_path, temp_dir):
     return repository
 
 
+AZURE_FIELDS = (
+    ("speech_endpoint", "Speech endpoint", False),
+    ("speech_api_key", "Speech API key", True),
+    ("summary_endpoint", "Azure OpenAI endpoint", False),
+    ("summary_api_key", "Azure OpenAI API key", True),
+    ("summary_deployment", "Model deployment name", False),
+)
+
+
+def clear_azure_settings():
+    st.session_state.pop("azure_overrides", None)
+    for name, _, _ in AZURE_FIELDS:
+        st.session_state["azure_" + name] = ""
+
+
+def azure_settings(fallback):
+    with st.expander("Azure settings", expanded=bool(fallback.azure_errors())):
+        st.caption("Enter settings for this session. Blank fields use environment/.env values. Keys are not saved to disk or shared with other sessions.")
+        with st.form("azure_settings_form"):
+            values = {}
+            for name, label, secret in AZURE_FIELDS:
+                values[name] = st.text_input(label, key="azure_" + name,
+                    type="password" if secret else "default",
+                    placeholder="Use fallback" if getattr(fallback, name) else "Required",
+                    help="HTTPS resource root, without an API path." if name.endswith("endpoint") else None)
+            submitted = st.form_submit_button("Apply Azure settings")
+        if submitted:
+            candidate = fallback.with_ui_overrides(values)
+            errors = candidate.azure_errors()
+            if errors:
+                st.error("Settings were not applied. " + " ".join(errors))
+            else:
+                st.session_state["azure_overrides"] = {name: value.strip() for name, value in values.items() if value.strip()}
+                st.success("Settings applied for this session. No connection test was performed.")
+        st.button("Clear session settings", on_click=clear_azure_settings)
+        if st.session_state.get("azure_overrides"):
+            st.caption("Using session overrides; blank fields use fallback settings.")
+        else:
+            st.caption("Using environment/.env fallback settings where available.")
+    return fallback.with_ui_overrides(st.session_state.get("azure_overrides", {}))
+
+
 def show_results(transcript, summary, key, source_mode="live"):
     def evidence(references):
         with st.expander("View evidence: " + ", ".join(references)):
@@ -81,10 +123,11 @@ def main():
     except Exception:
         st.error("Application configuration or local storage could not be initialized. Check .env values and folder permissions.")
         return
-    errors = settings.azure_errors()
     with st.sidebar:
         st.header("Workspace")
         st.caption("English · Hindi | Up to 10 minutes · 50 MB")
+        settings = azure_settings(settings)
+        errors = settings.azure_errors()
         if errors:
             st.warning("Azure setup pending")
             with st.expander("Required configuration"):

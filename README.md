@@ -16,7 +16,7 @@ python -m venv .venv
 
 On macOS/Linux use `.venv/bin/python` for the last two commands. Open [the local app](http://127.0.0.1:8501). The app binds to localhost and creates `data/calls.sqlite3` automatically. Sample preview requires no Azure account and makes no API requests; its transcript and summary are handwritten, not generated from uploaded audio.
 
-For live processing, copy `.env.example` to `.env` and configure the five Azure settings in the [Azure setup guide](docs/azure-setup.md). Restart after configuration changes. Upload remains disabled until required settings are present and valid. Configuration presence does not verify service access.
+For live processing, open **Azure settings** in the sidebar and enter the Speech endpoint/key, Azure OpenAI endpoint/key, and model deployment name. Select **Apply Azure settings**. Nonblank UI values take priority; blank fields fall back to environment variables or `.env` (see [Azure setup](docs/azure-setup.md)). Keys are masked, kept only in the current session, and never written to disk. **Clear session settings** removes UI overrides and restores fallback settings. A new browser session may require re-entry. Upload stays disabled until effective settings are valid; applying settings does not make a connection test or API call.
 
 ## Features
 
